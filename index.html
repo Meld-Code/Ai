@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#10121b" />
+  <meta name="description" content="Meld AI — a clean, browser-based chat workspace." />
+  <title>Meld AI</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="app-shell" id="appShell">
+    <div class="sidebar-scrim" id="sidebarScrim"></div>
+
+    <aside class="sidebar" id="sidebar" aria-label="Main sidebar">
+      <div class="sidebar-top">
+        <a class="brand" href="#" aria-label="Meld AI home" id="brandHome">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="brand-name">meld<span>ai</span></span>
+        </a>
+        <button class="icon-button sidebar-close" id="closeSidebarBtn" aria-label="Close sidebar" title="Close sidebar">✕</button>
+      </div>
+
+      <button class="new-chat-button" id="newChatBtn">
+        <span class="new-chat-plus">＋</span>
+        <span>New chat</span>
+        <kbd>⌘ K</kbd>
+      </button>
+
+      <button class="sidebar-action" id="searchToggleBtn">
+        <span class="sidebar-action-icon">⌕</span><span>Search chats</span><kbd>⌘ F</kbd>
+      </button>
+      <div class="search-box" id="searchBox" hidden>
+        <span aria-hidden="true">⌕</span>
+        <input id="chatSearchInput" type="search" placeholder="Search conversations" autocomplete="off" aria-label="Search conversations" />
+        <button class="search-clear" id="clearSearchBtn" aria-label="Clear search">×</button>
+      </div>
+
+      <div class="history-heading"><span>Your chats</span><span class="history-count" id="historyCount">0</span></div>
+      <nav class="chat-history" id="chatHistory" aria-label="Conversation history">
+        <div class="empty-history">Your conversations will appear here.</div>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="local-status"><span class="status-dot"></span><span>Local preview</span><span class="status-lock" title="No account or API key connected">◈</span></div>
+        <button class="profile-button" id="settingsBtn">
+          <span class="profile-avatar">M</span>
+          <span class="profile-copy"><strong>Meld AI</strong><small>Browser workspace</small></span>
+          <span class="profile-menu-icon">•••</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button mobile-menu" id="openSidebarBtn" aria-label="Open sidebar" title="Open sidebar">☰</button>
+          <div class="topbar-title"><span class="topbar-brand">Meld AI</span><span class="topbar-divider">/</span><span class="current-chat-title" id="currentChatTitle">New chat</span></div>
+        </div>
+        <div class="topbar-actions">
+          <span class="preview-pill"><span class="status-dot"></span> Local preview</span>
+          <button class="icon-button" id="themeToggleBtn" aria-label="Toggle color theme" title="Toggle theme"><span id="themeIcon">☾</span></button>
+          <button class="icon-button" id="exportCurrentBtn" aria-label="Export current conversation" title="Export conversation">⇩</button>
+        </div>
+      </header>
+
+      <section class="conversation-scroll" id="conversationScroll" aria-live="polite">
+        <div class="welcome-screen" id="welcomeScreen">
+          <div class="welcome-orb" aria-hidden="true"><div class="orb-core"></div><i></i><b></b></div>
+          <div class="welcome-eyebrow"><span class="eyebrow-line"></span> A CLEARER SPACE TO THINK <span class="eyebrow-line"></span></div>
+          <h1>What’s on your <span>mind?</span></h1>
+          <p class="welcome-subtitle">A calm space to organize thoughts, explore ideas, and get things moving.</p>
+
+          <div class="starter-grid" id="starterGrid">
+            <button class="starter-card" data-prompt="/help"><span class="starter-icon violet">✳</span><span><strong>Explore Meld</strong><small>See what works in this preview</small></span><span class="starter-arrow">↗</span></button>
+            <button class="starter-card" data-prompt="/calc 128 * 24"><span class="starter-icon blue">⌗</span><span><strong>Quick calculation</strong><small>Try a calculation locally</small></span><span class="starter-arrow">↗</span></button>
+            <button class="starter-card" data-prompt="/time"><span class="starter-icon orange">◷</span><span><strong>Check date & time</strong><small>Use your device’s local clock</small></span><span class="starter-arrow">↗</span></button>
+            <button class="starter-card" data-prompt="/wordcount The best ideas often start as small questions."><span class="starter-icon green">≋</span><span><strong>Work with text</strong><small>Count words in a passage</small></span><span class="starter-arrow">↗</span></button>
+          </div>
+
+          <div class="capability-note"><span class="note-icon">ⓘ</span><span><strong>Preview mode:</strong> this three-file version runs locally. It is not connected to ChatGPT, and it does not upload your messages.</span></div>
+        </div>
+
+        <div class="messages-wrap" id="messagesWrap" hidden>
+          <div class="messages-list" id="messagesList"></div>
+          <div class="conversation-end" id="conversationEnd"></div>
+        </div>
+      </section>
+
+      <footer class="composer-area">
+        <div class="composer-shell" id="composerShell">
+          <div class="attachment-tray" id="attachmentTray" hidden></div>
+          <form class="composer-form" id="composerForm">
+            <label class="sr-only" for="messageInput">Message Meld AI</label>
+            <textarea id="messageInput" rows="1" placeholder="Message Meld AI…" maxlength="12000" spellcheck="true"></textarea>
+            <div class="composer-toolbar">
+              <div class="composer-tools">
+                <button type="button" class="tool-button" id="attachBtn" aria-label="Attach files" title="Attach files"><span>＋</span></button>
+                <input type="file" id="fileInput" multiple hidden />
+                <span class="composer-hint">Local preview · Enter to send</span>
+              </div>
+              <div class="composer-tools right-tools">
+                <button type="button" class="tool-button voice-button" id="voiceBtn" aria-label="Voice input" title="Voice input">⌁</button>
+                <button type="submit" class="send-button" id="sendBtn" aria-label="Send message" disabled><span>↑</span></button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <p class="composer-disclaimer">Meld AI Preview can make mistakes. Your data stays in this browser unless you export it.</p>
+      </footer>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="settingsModal" hidden>
+    <section class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="modal-heading"><div><span class="modal-kicker">WORKSPACE</span><h2 id="settingsTitle">Settings</h2></div><button class="icon-button" id="closeSettingsBtn" aria-label="Close settings">✕</button></div>
+      <div class="settings-section">
+        <h3>Appearance</h3>
+        <p>Choose the look of your Meld AI workspace.</p>
+        <div class="theme-options"><button class="theme-option" data-theme-choice="dark"><span class="theme-preview dark-preview"></span><span>Dark</span><span class="theme-check" id="darkCheck">✓</span></button><button class="theme-option" data-theme-choice="light"><span class="theme-preview light-preview"></span><span>Light</span><span class="theme-check" id="lightCheck">✓</span></button></div>
+      </div>
+      <div class="settings-section">
+        <h3>About this version</h3>
+        <p>Meld AI is currently running as a static, browser-only preview. ChatGPT models, web search, image generation, account sync, and cloud file analysis are not connected.</p>
+        <div class="settings-info-row"><span>Connection</span><strong><span class="status-dot"></span> Local only</strong></div>
+        <div class="settings-info-row"><span>Conversation storage</span><strong>This browser</strong></div>
+        <div class="settings-info-row"><span>External libraries</span><strong>None required</strong></div>
+      </div>
+      <div class="settings-section">
+        <h3>Your data</h3>
+        <p>Conversations are stored in this browser’s local storage. Export a backup before clearing your history.</p>
+        <div class="settings-buttons"><button class="secondary-button" id="exportAllBtn">Export all chats</button><button class="danger-button" id="clearAllBtn">Clear all chats</button></div>
+      </div>
+      <div class="modal-footer"><span>Meld AI <span class="version-label">· Browser Preview</span></span><button class="text-button" id="settingsDoneBtn">Done</button></div>
+    </section>
+  </div>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
